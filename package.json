@@ -12,13 +12,22 @@
     "test:watch": "nwb test-react --server"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "react": "^16.0.0",
     "react-dom": "^16.0.0"
   },
   "devDependencies": {
+    "babel-eslint": "^8.0.1",
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb": "^16.0.0",
+    "eslint-import-resolver-webpack": "^0.8.3",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
     "nwb": "0.19.x"
   },
-  "author": "",
+  "author": "Alexander Demin <bouvens@gmail.com> (https://bouvens.github.io/)",
+  "homepage": "https://github.com/bouvens/monkey-writer",
   "license": "MIT",
   "repository": ""
 }
