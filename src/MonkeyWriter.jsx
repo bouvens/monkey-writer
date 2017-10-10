@@ -5,25 +5,40 @@ import { big } from './constants/texts'
 
 export default class MonkeyWriter extends Component {
     static propTypes = {
-        text: PropTypes.string,
+        initialText: PropTypes.string,
+        textLength: PropTypes.number,
+        level: PropTypes.number,
     }
 
     static defaultProps = {
-        text: big,
+        initialText: big,
+        textLength: 2000,
+        level: 1,
     }
 
     state = {
+        level: this.props.level,
         frequencies: {},
-        text: '',
+        initialText: '',
     }
 
     componentWillMount () {
         this.calculateFrequencies(this.generateText)
     }
 
+    lastChars = []
+
     calculateFrequencies = (callback) => {
-        const frequencies = _.reduce(_.split(this.props.text, ''), (f, char) => {
-            f[char] = _.isUndefined(f[char]) ? 1 : f[char] + 1
+        const text = this.props.initialText.split('')
+        const lastChars = text.splice(0, this.state.level)
+
+        const frequencies = _.reduce(text, (f, char) => {
+            const frequency = _.get(f, lastChars)
+
+            _.setWith(f, lastChars, _.isUndefined(frequency) ? 1 : frequency + 1, Object)
+
+            lastChars.shift()
+            lastChars.push(char)
 
             return f
         }, {})
@@ -32,33 +47,48 @@ export default class MonkeyWriter extends Component {
     }
 
     generateChar = () => {
-        const { length } = this.props.text
-        let random = Math.ceil(Math.random() * length)
+        const frequencies = _.isEmpty(this.lastChars)
+            ? this.state.frequencies
+            : _.get(this.state.frequencies, this.lastChars)
+        const sum = _.reduce(frequencies, _.add, 0)
+        let random = Math.ceil(Math.random() * sum)
 
-        return _.findKey(this.state.frequencies, (num) => {
+        const nextChar = _.findKey(frequencies, (num) => {
             random -= num
 
             return random <= 0
         })
+
+        if (!_.isEmpty(this.lastChars)) {
+            this.lastChars.shift()
+            this.lastChars.push(nextChar)
+        }
+
+        return nextChar
     }
 
     generateText = () => {
         const text = []
-        for (let i = 0; i <= 50; i += 1) {
+        this.lastChars = this.props.initialText
+            .substr(Math.floor(Math.random() * (this.props.textLength - this.state.level)), this.state.level - 1)
+            .split('')
+
+        for (let i = 0; i <= this.props.textLength; i += 1) {
             text.push(this.generateChar())
         }
 
-        this.setState({ text: text.join('')})
+        this.setState({ initialText: text.join('') })
     }
 
     render () {
+        // todo сделать нормальные стили элементов
         return (
             <div>
                 <button onClick={this.generateText}>Regenerate</button>
-                <p>Generated text:</p>
-                <pre>{this.state.text}</pre>
-                <p>Frequencies:</p>
-                {JSON.stringify(this.state.frequencies, null, 1)}
+                <p><strong>Generated text:</strong></p>
+                <pre style={{ whiteSpace: 'pre-wrap' }}>{this.state.initialText}</pre>
+                <p><strong>Frequencies:</strong></p>
+                <div>{JSON.stringify(this.state.frequencies, null, 2)}</div>
             </div>
         )
     }
