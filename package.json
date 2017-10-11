@@ -15,7 +15,8 @@
     "lodash": "^4.17.4",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "react-dom": "^16.0.0",
+    "state-control": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.1",
